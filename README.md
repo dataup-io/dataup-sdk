@@ -245,6 +245,119 @@ client = DataUpClient(
 )
 ```
 
+## Command Line Interface (CLI)
+
+The DataUp SDK includes a CLI for running evaluations and managing configuration.
+
+### Installation
+
+The CLI is installed automatically with the SDK:
+
+```bash
+pip install dataup
+```
+
+### Configuration
+
+Configure your credentials (stored in `~/.dataup/config`):
+
+```bash
+dataup configure
+```
+
+You'll be prompted for:
+- **DataUp API Key** - Your API key in format `key_id.key_secret`
+- **CVAT API Token** - Your CVAT authentication token
+- **CVAT Base URL** - CVAT server URL (default: `https://app.cvat.ai`)
+
+Alternatively, use environment variables (these take precedence over the config file):
+
+```bash
+export DATAUP_API_KEY="your_key_id.your_key_secret"
+export CVAT_API_TOKEN="your_cvat_token"
+export CVAT_BASE_URL="https://app.cvat.ai"
+```
+
+View your current configuration:
+
+```bash
+dataup show-config
+```
+
+### Evaluation Commands
+
+Run model evaluations against CVAT datasets. Use either `dataup evaluation` or `dataup eval`.
+
+#### Run an Evaluation
+
+```bash
+dataup eval run \
+    --provider ultralytics \
+    --task 121 \
+    --weights yolov8n.pt \
+    --agent-name "my-model" \
+    --agent-version "1.0.0" \
+    --conf 0.25 \
+    --iou 0.5
+```
+
+**Options:**
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--provider` | Yes | Inference provider (`ultralytics` or `roboflow`) |
+| `--task` | Yes | CVAT task ID to evaluate against |
+| `--weights` | Yes | Path to model weights or model identifier |
+| `--agent-id` | No | DataUp agent ID for this evaluation |
+| `--agent-name` | No | Name of the model being evaluated |
+| `--agent-version` | No | Agent version string (default: `1.0.0`) |
+| `--conf` | No | Confidence threshold (default: `0.25`) |
+| `--iou` | No | IoU threshold for NMS (default: `0.5`) |
+| `--batch-size` | No | Frames per batch (default: `10`) |
+
+#### Run from Checkpoint (Async)
+
+For efficient evaluation with async I/O:
+
+```bash
+dataup eval from-checkpoint \
+    --provider ultralytics \
+    --task 121 \
+    --checkpoint best.pt \
+    --agent-name "my-model"
+```
+
+#### List Evaluations
+
+```bash
+dataup eval list --limit 20
+```
+
+#### Get Evaluation Results
+
+```bash
+dataup eval get --evaluation-id eval_abc123
+```
+
+#### Delete an Evaluation
+
+```bash
+dataup eval delete --evaluation-id eval_abc123
+```
+
+### CLI Reference
+
+| Command | Description |
+|---------|-------------|
+| `dataup configure` | Configure credentials interactively |
+| `dataup show-config` | Display current configuration |
+| `dataup eval run` | Run evaluation with inference provider |
+| `dataup eval from-checkpoint` | Run evaluation with async I/O |
+| `dataup eval list` | List evaluations |
+| `dataup eval get` | Get evaluation details and metrics |
+| `dataup eval delete` | Delete an evaluation |
+| `dataup --version` | Show CLI version |
+| `dataup --help` | Show help |
+
 ## License
 
 MIT
